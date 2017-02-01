@@ -1,0 +1,370 @@
+/********************************************************************************************************************************
+                                                  TIME CAM FILMS
+                                                  trolley movement code version 1.0
+                                                  copyrights -youtube.com/TIMECAMFILMS (Brandon D'cunha)
+ ********************************************************************************************************************************/
+#include <AFMotor.h>
+#include <nikonIrControl.h>
+int CameraIrPin = 13;   
+AF_Stepper motor(200,1);
+
+unsigned long time_since_last_reset = 0;
+unsigned long boom = 0;  
+int interval_one = 1000;                  //1 seconds, 1st while loop
+int interval_two = 5000;
+int fb;
+int etime,stime;
+int motorspeedrpm;
+void setup() {
+    pinMode(CameraIrPin, OUTPUT);
+  // put your setup code here, to run once:
+Serial.begin(9600); 
+Serial.println("enter motor speed in rpm 1-10 ");
+while (Serial.available() == 0);
+motorspeedrpm=Serial.parseInt();
+motor.setSpeed(motorspeedrpm);  // 10 rpm or 100 **************************************************************
+}
+
+void loop() {
+  //stime= micros();
+ int choice;
+
+// put your main code here, to run repeatedly:
+Serial.println("enter yours Choice ");
+
+Serial.println("1.interval mode (shoot-move-shoot");
+Serial.println("2.continous mode");
+Serial.println("3.longer shutter (add 3 seconds with buffer and shutterspeed on your remote");
+Serial.println("4.Aperture Priority Mode(Under COnstrustin )");// still to be tested 
+Serial.println("5.test mode");
+while (Serial.available() == 0);
+choice=Serial.parseInt();
+switch (choice)
+{
+
+  /*********************************************************************************************************************
+                                                    INTERVAL (MOVE-SHOOT-MOVE) MODE
+ ***********************************************************************************************************************/
+       
+  case 1 :{
+           int t;
+          
+           int a;
+           int s;
+           Serial.println("1. FORWARD");
+           Serial.println("2. BACKWARD");
+           while (Serial.available() == 0);
+           fb=Serial.parseInt();
+           //********************************************FORWARD******************************************************************
+           if(fb==1)
+           {
+           Serial.println("enter the interval time ");
+           while (Serial.available() == 0);
+           a=Serial.parseInt();
+           Serial.println("");
+           Serial.println("");
+           Serial.println("************enter to start now !!!***********");
+           while (Serial.available() == 0);
+           s=Serial.parseInt();
+           a=(a*1000)-1000;
+            
+           t=a/2;
+           delay(1000);
+           Serial.println("shoot");       //************************************************************************
+         delay(300);
+           for(int i=0;i<1000;i++)
+               {
+
+                Serial.println("click"); 
+                     delay(t);           
+           //1st while loop  
+                      time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, FORWARD,DOUBLE);
+                              motor.release();     //task one wants repeated
+                                                                     //for interval_one  
+                      }
+                
+                     
+                          delay(t);                         
+                   Serial.println("clicking");
+                   cameraSnap(CameraIrPin);
+               }
+           }
+           //********************************************BACKWARD******************************************************************
+           else if(fb==2)
+           {
+           Serial.println("enter the interval time ");
+           while (Serial.available() == 0);
+           a=Serial.parseInt();
+           Serial.println("");
+           Serial.println("");
+           Serial.println("************enter to start!!!***********");
+           while (Serial.available() == 0);
+           s=Serial.parseInt();
+           a=(a*1000)-1000;
+            
+           t=a/2;
+           delay(1000);
+           Serial.println("shoot");       //************************************************************************
+         delay(300);
+           for(int i=0;i<1000;i++)
+               {
+
+                Serial.println("click"); 
+                     delay(t);           
+           //1st while loop  
+                      time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, BACKWARD,DOUBLE);
+                              motor.release();     //task one wants repeated
+                                                                     //for interval_one  
+                      }
+                
+                     
+                          delay(t);                         
+                   Serial.println("clicking");
+                   cameraSnap(CameraIrPin);
+               }
+           }
+           else
+                    Serial.print("only press 1 or 2");
+                              break;
+          
+             }
+   /*********************************************************************************************************************
+                                                    CONTINOUS MODE
+ ***********************************************************************************************************************/
+       
+     case 2 : {    
+            Serial.println("1. FORWARD");
+            Serial.println("2. BACKWARD");
+            while (Serial.available() == 0);
+            fb=Serial.parseInt();
+            Serial.print("****start****");
+            Serial.print("click");
+            
+     //********************************************FORWARD******************************************************************
+                        if(fb==1)
+                  {
+                Serial.print("in continous mode");
+                for(int i=0;;i++)
+               {
+                 Serial.println("moving");
+                  motor.step(100, FORWARD,SINGLE);
+                      motor.release(); 
+               }
+                        
+     }
+     //********************************************BACKWARD******************************************************************
+     else if(fb==2)
+            {
+                Serial.print("in continous mode");
+                for(int i=0;;i++)
+               {
+                 Serial.println("moving");
+                  motor.step(100, BACKWARD,SINGLE);
+                      motor.release(); 
+               }
+                        
+     }
+     else 
+          Serial.println("select only 1 or 2");
+     break;
+     }
+     /*********************************************************************************************************************
+                                                    LONGER SHUTTER
+ ***********************************************************************************************************************/
+       
+       case 3 :{
+                int a;
+                int s;
+                int b;
+                            Serial.println("1. FORWARD");
+            Serial.println("2. BACKWARD");
+            while (Serial.available() == 0);
+            fb=Serial.parseInt();
+            //********************************************FORWARD******************************************************************
+            if(fb==1)
+                  {
+                
+                Serial.println("enter the buffer time ");
+  while (Serial.available() == 0);
+           b=Serial.parseInt();
+           Serial.println("ENTER shutter time");
+           while (Serial.available() == 0);
+           s=Serial.parseInt();
+           s=(s*1000);
+           b=(b*1000);//+500;
+           delay(1000);
+         Serial.println("*******CLICK START!!!*******");
+         delay(300);
+                   
+      
+                    
+                    
+                    
+                    
+                      for(int i=0;i<1000;i++)
+               {
+                Serial.println("click"); 
+               delay(s);
+               delay(1000);
+                time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, FORWARD,SINGLE);
+                              motor.release();     //task one wants repeated
+                                                                     //for interval_one  
+                      }
+                            Serial.println("Buffering");
+                          delay(b);
+                 delay(1000);
+               }
+                  }
+     //********************************************BACKWARD******************************************************************
+                        else if(fb==2)
+                  {
+                
+                Serial.println("enter the buffer time ");
+  while (Serial.available() == 0);
+           b=Serial.parseInt();
+           Serial.println("ENTER shutter time");
+           while (Serial.available() == 0);
+           s=Serial.parseInt();
+           s=(s*1000);
+           b=(b*1000);//+500;
+           delay(1000);
+         Serial.println("*******CLICK START!!!*******");
+         delay(300);
+                   
+      
+                    
+                    
+                    
+                    
+                      for(int i=0;i<1000;i++)
+               {
+                Serial.println("click"); 
+               delay(s);
+               delay(1000);
+                time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, BACKWARD,SINGLE);
+                              motor.release();     //task one wants repeated
+                                                                     //for interval_one  
+                      }
+                            Serial.println("Buffering");
+                          delay(b);
+                 delay(1000);
+               }
+                  }
+                  else 
+                  Serial.println("error chose only 1 or 2");
+                              break;
+        
+        
+       }
+/*********************************************************************************************************************
+                                                    APETURE PRIORITY
+ ***********************************************************************************************************************/
+       
+       case 4:
+       {
+        int a;
+                      Serial.println("1. FORWARD");
+            Serial.println("2. BACKWARD");
+            while (Serial.available() == 0);
+            fb=Serial.parseInt();
+            //********************************************FORWARD******************************************************************
+            if(fb==1)
+                  {
+        Serial.print("Enter Final Coanstant Shutter speed ");
+         while (Serial.available() == 0);
+           a=Serial.parseInt();
+           a=a*1000;
+           Serial.print("******start shoot*****");
+           delay(300);
+           for(int i=0;i<1000;i++)
+              {
+              Serial.println("click"); 
+               delay(a);
+               delay(1000);
+                time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, BACKWARD,SINGLE);
+                              motor.release();     //task one wants repeated
+                                                                     //for interval_one  
+                      }
+                            Serial.println("Buffering");
+                                          delay(1000);
+              }
+                  }
+                    //********************************************BACKWARD******************************************************************
+            else if(fb==2)
+                  {
+        Serial.print("Enter Final Coanstant Shutter speed ");
+         while (Serial.available() == 0);
+           a=Serial.parseInt();
+           a=a*1000;
+           Serial.print("******start shoot*****");
+           delay(300);
+           for(int i=0;i<1000;i++)
+              {
+              Serial.println("click"); 
+               delay(a);
+               delay(1000);
+                time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, BACKWARD,SINGLE);
+                              motor.release();     //task one wants repeated
+                                                                     //for interval_one  
+                      }
+                            Serial.println("Buffering");
+                                          delay(1000);
+              }
+                  }
+
+                    else
+                    Serial.print("error choose between 1-2");
+
+         break;
+       }
+       case 5:
+       {
+        Serial.println("Click");
+        delay(300);
+for(int i=0;i<1000;i++)
+              {
+        boom = millis();                 //obtain reference  
+                       while((millis() - boom) < interval_two)
+                       { 
+                        delay(2000);
+                        time_since_last_reset = millis();                 //obtain reference  
+                       while((millis() - time_since_last_reset) < interval_one)
+                       { 
+                           Serial.println("moving");
+                             motor.step(1, FORWARD,DOUBLE);
+                              motor.release();     //task one wants repeated
+                       }                                        //for interval_one  
+                       delay(2000);
+                      }
+              }
+       }
+case 6: exit;
+}
+
+//etime=micros();
+//Serial.print(etime-stime);
+}

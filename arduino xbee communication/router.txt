@@ -1,0 +1,30 @@
+#include <dht.h>
+dht DHT;
+#define DHT11_PIN 7
+void setup() {
+// initialize serial communication at 9600 bits per second:
+Serial.begin(9600);
+}
+
+
+void loop() {
+  // put your main code here, to run repeatedly:
+int soil = analogRead(A0); 
+int rain = analogRead(A1); 
+int chk=DHT.read11(DHT11_PIN);
+int choice;
+while (Serial.available() == 0);
+choice=Serial.parseInt();
+if(choice=1)
+{
+ delay(2000);
+Serial.println(DHT.temperature);
+delay(1000);
+Serial.println(DHT.humidity);
+delay(1000);
+Serial.println(soil);
+delay(1000);
+Serial.println(rain);
+}
+//delay(300000);
+}

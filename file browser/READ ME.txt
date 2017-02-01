@@ -1,0 +1,1 @@
+install ssh on your machine and then run index.shh to use this 

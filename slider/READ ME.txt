@@ -1,0 +1,5 @@
+THIS IS AN ARDUINO CODE 
+COPY AND PASTE THE CODE IN THE ARDUINO IDE
+
+This code is for arduino controlled slider used in making timelapse videos.
+this is a DIY project.

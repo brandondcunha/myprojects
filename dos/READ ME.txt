@@ -1,0 +1,2 @@
+install ssh and perl before running this files 
+after installation run the index.ssh file and enjoy !!
